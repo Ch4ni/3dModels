@@ -47,22 +47,29 @@ module roundedcube(xx, yy, height, radius, circle_resolution=36) {
 totalZ=2;
 resolution=360;
 
-switchWidth=14.1; // I measured the switches at 13.8mm, but that proved a little snug
+switchWidth=14.0; // I measured the switches at 13.8mm, but that proved a little snug
 
 numRows=4;
-numCols=4;
-switchPadding=2;
+numCols=6;
+switchPadding=3;
 sidePadding=10;
-topPadding=10;
-botPadding=topPadding;
+topPadding=20;
+botPadding=5;
 
 totalX = (2 * sidePadding) + (numCols * switchWidth) + ((numCols-1) * switchPadding);
 totalY = topPadding + botPadding + (numRows * switchWidth) + ((numRows - 1) * switchPadding);
 
+switchPositions=[for(i=[1:1:numCols], j=[1:1:numRows]) 
+        [sidePadding + ((i-1)*switchWidth) + ((i-1) * switchPadding), 
+        topPadding + ((j-1)*switchWidth) + ((j-1) * switchPadding), -1]];
 
-difference() {
-    roundedcube(totalX,totalY,totalZ,2.5, circle_resolution=resolution);
-    offsetX=(totalX-switchWidth)/2;
-    offsetY=(totalY-switchWidth)/2;
-    translate([offsetX,offsetY,-1]) cube([switchWidth, switchWidth, totalZ+2]);
+union() {
+    difference() {
+        roundedcube(totalX,totalY,totalZ,2.5, circle_resolution=resolution);
+        for(i=switchPositions){
+            translate(i) cube([switchWidth, switchWidth, totalZ+2]);
+        } 
+    }
+    cylinder(3*totalZ, 1, false);
 }
+
